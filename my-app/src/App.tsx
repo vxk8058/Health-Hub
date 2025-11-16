@@ -7,6 +7,8 @@ import AppointmentBooking from './components/AppointmentBooking.tsx';
 import AppointmentConfirmation from './components/AppointmentConfirmation.tsx';
 import CreateAccount from './components/CreateAccount.tsx';
 import HomePage from './components/HomePage.tsx';
+import MapPage from './components/MapPage.tsx';
+import CalanderSync from './components/CalanderSync.tsx';
 
 interface Appointment {
   id: string;
@@ -86,6 +88,8 @@ export default function App() {
             element={<AppointmentBooking addAppointment={addAppointment} userZipCode={userData.email ? '10001' : ''} />} 
           />
           <Route path="/appointment-confirmation" element={<AppointmentConfirmation />} />
+          <Route path="/map" element={<MapPage />} />
+          <Route path="/calendar-sync" element={<CalanderSync addAppointment={addAppointment} />} />
         </Routes>
       </Router>
     </div>
