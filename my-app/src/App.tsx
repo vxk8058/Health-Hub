@@ -11,6 +11,10 @@ import HomePage from './components/HomePage.tsx';
 import MapPage from './components/MapPage.tsx';
 import CalanderSync from './components/CalanderSync.tsx';
 import MyAppointments from './components/MyAppointments.tsx';
+import MyHealthcare from './components/MyHealthcare';
+import Settings from './components/Settings';
+import Layout from './components/Layout';
+import EligibilityCheck from './components/EligibilityCheck';
 
 
 export interface Appointment {
@@ -30,7 +34,11 @@ export default function App() {
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
-    email: ''
+    email: '',
+    zipCode: '',
+    phone: '',
+    address: '',
+    dateOfBirth: ''
   });
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -39,7 +47,11 @@ export default function App() {
     setUserData({
       firstName: data.firstName || '',
       lastName: data.lastName || '',
-      email: data.email || ''
+      email: data.email || '',
+      zipCode: data.zipCode || '',
+      phone: data.phone || '',
+      address: data.address || '',
+      dateOfBirth: data.dateOfBirth || ''
     });
     setIsAuthenticated(true);
   };
@@ -56,6 +68,20 @@ export default function App() {
 
   const cancelAppointment = (id: string) => {
     setAppointments(appointments.filter(apt => apt.id !== id));
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUserData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      zipCode: '',
+      phone: '',
+      address: '',
+      dateOfBirth: ''
+    });
+    setAppointments([]);
   };
 
   return (
@@ -88,30 +114,75 @@ export default function App() {
             path="/home"
             element={
               isAuthenticated ? (
-                <HomePage
-                  userName={userData.firstName}
-                  stressEntries={[]}        
-                  prescriptions={[]}         
-                  appointments={appointments}          
-                />
+                <Layout userName={userData.firstName} onLogout={handleLogout}>
+                  <HomePage
+                    userName={userData.firstName}
+                    stressEntries={[]}    
+                    prescriptions={[]}    
+                    appointments={appointments}
+                  />
+                </Layout>
               ) : (
                 <Navigate to="/login" replace />
               )
             }
           />
 
-          <Route 
+<Route 
             path="/appointment-booking" 
             element={
-              <AppointmentBooking 
-                addAppointment={addAppointment} 
-                userZipCode={userData.email ? '10001' : ''} 
-              />
+              <Layout userName={userData.firstName} onLogout={handleLogout}>
+                <AppointmentBooking
+                  addAppointment={addAppointment}
+                  userZipCode={userData.zipCode}
+                />
+              </Layout>
             } 
           />
 
-          <Route path="/appointment-confirmation" element={<AppointmentConfirmation />} />
-          <Route path="/map" element={<MapPage />} />
+          <Route
+            path="/appointment-confirmation"
+            element={
+              <Layout userName={userData.firstName} onLogout={handleLogout}>
+                <AppointmentConfirmation />
+              </Layout>
+          }
+          />
+          <Route
+            path="/map"
+            element={
+              <Layout userName={userData.firstName} onLogout={handleLogout}>
+                <MapPage />
+              </Layout>
+            }
+          />
+
+          <Route
+            path="/my-healthcare"
+            element={
+              <Layout userName={userData.firstName} onLogout={handleLogout}>
+                <MyHealthcare />
+              </Layout>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <Layout userName={userData.firstName} onLogout={handleLogout}>
+                <Settings userData={userData} setUserData={setUserData} />
+              </Layout>
+            }
+
+          />
+          <Route
+            path="/eligibility-check"
+            element={
+              <Layout userName={userData.firstName} onLogout={handleLogout}>
+                <EligibilityCheck />
+              </Layout>
+            } 
+          />
+
           <Route path="/calendar-sync" element={<CalanderSync addAppointment={addAppointment} />} />
 
           {/* Route for MyAppointments */}
