@@ -28,8 +28,6 @@ export default function Login({ setUserData, handleLogin }: LoginProps) {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="bg-white rounded-[2rem] p-16 w-full max-w-md shadow-2xl shadow-purple-100 border border-gray-100">
-        <p className="text-gray-400 mb-12 tracking-wide">Login</p>
-        
         <div className="mb-8">
           <label className="block text-gray-700 mb-3">Login</label>
           <input

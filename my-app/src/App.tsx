@@ -3,11 +3,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 import WelcomeScreen from './components/WelcomeScreen.tsx';
 import Login from './components/Login.tsx';
-
-
+import CreateAccount from './components/CreateAccount.tsx';
+import HomePage from './components/HomePage.tsx';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -15,7 +16,11 @@ export default function App() {
   });
 
   const handleLogin = (data: any) => {
-    setUserData(data);
+    setUserData({
+      firstName: data.firstName || '',
+      lastName: data.lastName || '',
+      email: data.email || ''
+    });
     setIsAuthenticated(true);
   };
 
@@ -33,7 +38,30 @@ export default function App() {
               />
             }
           />
-
+          <Route
+            path="/create-account"
+            element={
+              <CreateAccount
+                setUserData={setUserData}
+                handleLogin={handleLogin}
+              />
+            }
+          />
+          <Route
+            path="/home"
+            element={
+              isAuthenticated ? (
+                <HomePage
+                  userName={userData.firstName}
+                  stressEntries={[]}        
+                  prescriptions={[]}         
+                  appointments={[]}          
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
         </Routes>
       </Router>
     </div>
