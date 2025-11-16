@@ -226,13 +226,18 @@ export default function App() {
                   userName={userData.firstName}
                   onLogout={handleLogout}
                 >
-                  <Settings userData={userData} setUserData={setUserData} />
+                  <Settings
+                    userData={userData}
+                    onUpdateUserData={setUserData}
+                    onLogout={handleLogout}
+                  />
                 </Layout>
               ) : (
                 <Navigate to="/login" replace />
               )
             }
           />
+
 
           <Route
             path="/eligibility-check"
