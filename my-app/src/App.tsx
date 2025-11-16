@@ -5,8 +5,8 @@ import WelcomeScreen from './components/WelcomeScreen.tsx';
 import Login from './components/Login.tsx';
 import AppointmentBooking from './components/AppointmentBooking.tsx';
 import AppointmentConfirmation from './components/AppointmentConfirmation.tsx';
-
-
+import CreateAccount from './components/CreateAccount.tsx';
+import HomePage from './components/HomePage.tsx';
 
 interface Appointment {
   id: string;
@@ -18,6 +18,7 @@ interface Appointment {
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -26,7 +27,11 @@ export default function App() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const handleLogin = (data: any) => {
-    setUserData(data);
+    setUserData({
+      firstName: data.firstName || '',
+      lastName: data.lastName || '',
+      email: data.email || ''
+    });
     setIsAuthenticated(true);
   };
 
@@ -50,6 +55,30 @@ export default function App() {
                 setUserData={setUserData}
                 handleLogin={handleLogin}
               />
+            }
+          />
+          <Route
+            path="/create-account"
+            element={
+              <CreateAccount
+                setUserData={setUserData}
+                handleLogin={handleLogin}
+              />
+            }
+          />
+          <Route
+            path="/home"
+            element={
+              isAuthenticated ? (
+                <HomePage
+                  userName={userData.firstName}
+                  stressEntries={[]}        
+                  prescriptions={[]}         
+                  appointments={appointments}          
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
           <Route 
