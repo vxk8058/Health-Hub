@@ -1,4 +1,12 @@
 import { useState } from 'react';
+
+// Define or import the StressEntry type
+export interface StressEntry {
+  id: string;
+  date: string;
+  stressLevel: number;
+  notes?: string;
+}
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import React from 'react';
 
@@ -15,7 +23,9 @@ import MyHealthcare from './components/MyHealthcare.tsx';
 import Settings from './components/Settings.tsx';
 import Layout from './components/Layout.tsx';
 import EligibilityCheck from './components/EligibilityCheck.tsx';
-
+import MyWellness from './components/MyWellness.tsx';
+import LogStress from './components/LogStress.tsx';
+import Prescriptions from './components/PrescriptionManager.tsx';
 
 export interface Appointment {
   id: string;
@@ -128,7 +138,7 @@ export default function App() {
             }
           />
 
-<Route 
+          <Route 
             path="/appointment-booking" 
             element={
               <Layout userName={userData.firstName} onLogout={handleLogout}>
@@ -190,10 +200,61 @@ export default function App() {
             path="/my-appointments"
             element={
               isAuthenticated ? (
-                <MyAppointments
-                  appointments={appointments}
-                  onCancelAppointment={cancelAppointment}
-                />
+                <Layout userName={userData.firstName} onLogout={handleLogout}>
+                  <MyAppointments
+                    appointments={appointments}
+                    onCancelAppointment={cancelAppointment}
+                  />
+                </Layout>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+
+          <Route
+            path="/my-wellness"
+            element={
+              isAuthenticated ? (
+                <Layout userName={userData.firstName} onLogout={handleLogout}>
+                  <MyWellness />
+                </Layout>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+
+          <Route
+            path="/prescriptions"
+            element={
+              isAuthenticated ? (
+                <Layout userName={userData.firstName} onLogout={handleLogout}>
+                  <Prescriptions prescriptions={[]} onAddPrescription={function (prescription: Omit<Prescription, 'id'>): void {
+                    throw new Error('Function not implemented.');
+                  } } onDeletePrescription={function (id: string): void {
+                    throw new Error('Function not implemented.');
+                  } } />
+                </Layout>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+
+          <Route
+            path="/log-stress"
+            element={
+              isAuthenticated ? (
+                <Layout userName={userData.firstName} onLogout={handleLogout}>
+                  <LogStress addStressEntry={function (entry: Omit<StressEntry, 'id'>): void {
+                    throw new Error('Function not implemented.');
+                  } } stressEntries={[]} prescriptions={[]} addPrescription={function (prescription: Omit<Prescription, 'id'>): void {
+                    throw new Error('Function not implemented.');
+                  } } deletePrescription={function (id: string): void {
+                    throw new Error('Function not implemented.');
+                  } } />
+                </Layout>
               ) : (
                 <Navigate to="/login" replace />
               )
