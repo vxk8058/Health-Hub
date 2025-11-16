@@ -104,7 +104,7 @@ export default function CalendarSync({ addAppointment }: CalendarSyncProps) {
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     
-    const calendar = [];
+    const calendar: (number | null)[][] = [];
     let week = new Array(firstDay).fill(null);
     
     for (let day = 1; day <= daysInMonth; day++) {
