@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { User, Save, BookOpen, X, Calendar, Moon, Smile, Frown, Meh } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { StressEntry, Prescription } from '../App';
-import PrescriptionManager from './PrescriptionManager';
+import PrescriptionManager from './PrescriptionManager.tsx';
 import React from 'react';
 
 interface LogStressProps {
