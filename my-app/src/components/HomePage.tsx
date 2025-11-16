@@ -1,5 +1,6 @@
 import { User, Home, Heart, Settings, Moon, Calendar, Pill, Activity, TrendingUp, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 interface HomePageProps {
   userName: string;

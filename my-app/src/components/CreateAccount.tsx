@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { User, Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 interface CreateAccountProps {
   setUserData: (data: any) => void;

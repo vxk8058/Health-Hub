@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MapPin, Mail, Phone, Clock, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 interface Appointment {
   id: string;

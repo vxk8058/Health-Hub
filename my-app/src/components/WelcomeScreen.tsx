@@ -1,5 +1,6 @@
 import { User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 export default function WelcomeScreen() {
   const navigate = useNavigate();

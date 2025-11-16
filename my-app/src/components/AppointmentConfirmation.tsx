@@ -1,4 +1,5 @@
 import { Check, Calendar, Clock, MapPin, User, Home as HomeIcon } from 'lucide-react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function AppointmentConfirmation() {

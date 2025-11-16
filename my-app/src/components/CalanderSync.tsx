@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
 
 interface Appointment {
   id: string;
