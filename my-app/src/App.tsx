@@ -10,13 +10,18 @@ import CreateAccount from './components/CreateAccount.tsx';
 import HomePage from './components/HomePage.tsx';
 import MapPage from './components/MapPage.tsx';
 import CalanderSync from './components/CalanderSync.tsx';
+import MyAppointments from './components/MyAppointments.tsx';
 
-interface Appointment {
+
+export interface Appointment {
   id: string;
   date: string;
   time: string;
-  center: string;
-  type: string;
+  centerName: string;
+  centerAddress: string;
+  doctorName?: string;
+  doctorSpecialization?: string;
+  reason?: string;
 }
 
 export default function App() {
@@ -27,6 +32,7 @@ export default function App() {
     lastName: '',
     email: ''
   });
+
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const handleLogin = (data: any) => {
@@ -41,9 +47,15 @@ export default function App() {
   const addAppointment = (appointment: Omit<Appointment, 'id'>) => {
     const newAppointment: Appointment = {
       ...appointment,
-      id: Date.now().toString()
+      id: Date.now().toString(),
+      centerName: appointment.centerName || 'Unknown Center',
+      centerAddress: appointment.centerAddress || 'Address not provided',
     };
     setAppointments([...appointments, newAppointment]);
+  };
+
+  const cancelAppointment = (id: string) => {
+    setAppointments(appointments.filter(apt => apt.id !== id));
   };
 
   return (
@@ -51,6 +63,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<WelcomeScreen />} />
+
           <Route
             path="/login"
             element={
@@ -60,6 +73,7 @@ export default function App() {
               />
             }
           />
+
           <Route
             path="/create-account"
             element={
@@ -69,6 +83,7 @@ export default function App() {
               />
             }
           />
+
           <Route
             path="/home"
             element={
@@ -84,13 +99,35 @@ export default function App() {
               )
             }
           />
+
           <Route 
             path="/appointment-booking" 
-            element={<AppointmentBooking addAppointment={addAppointment} userZipCode={userData.email ? '10001' : ''} />} 
+            element={
+              <AppointmentBooking 
+                addAppointment={addAppointment} 
+                userZipCode={userData.email ? '10001' : ''} 
+              />
+            } 
           />
+
           <Route path="/appointment-confirmation" element={<AppointmentConfirmation />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/calendar-sync" element={<CalanderSync addAppointment={addAppointment} />} />
+
+          {/* Route for MyAppointments */}
+          <Route
+            path="/my-appointments"
+            element={
+              isAuthenticated ? (
+                <MyAppointments
+                  appointments={appointments}
+                  onCancelAppointment={cancelAppointment}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
         </Routes>
       </Router>
     </div>
