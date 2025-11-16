@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { User, Save, BookOpen, X, Calendar, Moon, Smile, Frown, Meh } from 'lucide-react';
+import { Save, BookOpen, X, Calendar, Moon, Smile, Frown, Meh } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { StressEntry, Prescription } from '../App';
-import PrescriptionManager from './PrescriptionManager.tsx';
+import type { StressEntry } from '../App';
+import PrescriptionManager, { Prescription } from './PrescriptionManager.tsx';
 import React from 'react';
 
 interface LogStressProps {
@@ -14,7 +14,6 @@ interface LogStressProps {
 }
 
 export default function LogStress({ addStressEntry, stressEntries, prescriptions, addPrescription, deletePrescription }: LogStressProps) {
-  const navigate = useNavigate();
   const [stressLevel, setStressLevel] = useState(3);
   const [sleepHours, setSleepHours] = useState(8);
   const [journal, setJournal] = useState('');

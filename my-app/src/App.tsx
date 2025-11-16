@@ -1,12 +1,7 @@
 import { useState } from 'react';
 
 // Define or import the StressEntry type
-export interface StressEntry {
-  id: string;
-  date: string;
-  stressLevel: number;
-  notes?: string;
-}
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import React from 'react';
 
@@ -25,7 +20,18 @@ import Layout from './components/Layout.tsx';
 import EligibilityCheck from './components/EligibilityCheck.tsx';
 import MyWellness from './components/MyWellness.tsx';
 import LogStress from './components/LogStress.tsx';
-import Prescriptions from './components/PrescriptionManager.tsx';
+import PrescriptionsManager, {
+  Prescription,
+} from './components/PrescriptionManager.tsx';
+export interface StressEntry {
+  id: string;
+  date: string;
+  stressLevel: number;
+  sleepHours: number;
+  journal: string;
+  mood: string;
+  typeNote?: string;
+}
 
 export interface Appointment {
   id: string;
@@ -52,6 +58,8 @@ export default function App() {
   });
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [stressEntries, setStressEntries] = useState<StressEntry[]>([]);
+  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
 
   const handleLogin = (data: any) => {
     setUserData({
@@ -66,20 +74,6 @@ export default function App() {
     setIsAuthenticated(true);
   };
 
-  const addAppointment = (appointment: Omit<Appointment, 'id'>) => {
-    const newAppointment: Appointment = {
-      ...appointment,
-      id: Date.now().toString(),
-      centerName: appointment.centerName || 'Unknown Center',
-      centerAddress: appointment.centerAddress || 'Address not provided',
-    };
-    setAppointments([...appointments, newAppointment]);
-  };
-
-  const cancelAppointment = (id: string) => {
-    setAppointments(appointments.filter(apt => apt.id !== id));
-  };
-
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUserData({
@@ -89,10 +83,56 @@ export default function App() {
       zipCode: '',
       phone: '',
       address: '',
-      dateOfBirth: ''
+      dateOfBirth: '',
     });
     setAppointments([]);
+    setStressEntries([]);
+    setPrescriptions([]);
   };
+
+  const addAppointment = (
+    appointment: Omit<Appointment, 'id'> & {
+      centerName?: string;
+      centerAddress?: string;
+    },
+  ) => {
+    const newAppointment: Appointment = {
+      id: Date.now().toString(),
+      date: appointment.date,
+      time: appointment.time,
+      doctorName: appointment.doctorName,
+      doctorSpecialization: appointment.doctorSpecialization,
+      reason: appointment.reason,
+      centerName: appointment.centerName || 'Unknown Center',
+      centerAddress: appointment.centerAddress || 'Address not provided',
+    };
+    setAppointments((prev) => [...prev, newAppointment]);
+  };
+
+  const cancelAppointment = (id: string) => {
+    setAppointments(appointments.filter(apt => apt.id !== id));
+  };
+
+  const addStressEntry = (entry: Omit<StressEntry, 'id'>) => {
+    const newEntry: StressEntry = {
+      ...entry,
+      id: Date.now().toString(),
+    };
+    setStressEntries((prev) => [...prev, newEntry]);
+  };
+
+  const addPrescription = (prescription: Omit<Prescription, 'id'>) => {
+    const newRx: Prescription = {
+      ...prescription,
+      id: Date.now().toString(),
+    };
+    setPrescriptions((prev) => [...prev, newRx]);
+  };
+
+  const deletePrescription = (id: string) => {
+    setPrescriptions((prev) => prev.filter((p) => p.id !== id));
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -127,8 +167,8 @@ export default function App() {
                 <Layout userName={userData.firstName} onLogout={handleLogout}>
                   <HomePage
                     userName={userData.firstName}
-                    stressEntries={[]}    
-                    prescriptions={[]}    
+                    stressEntries={stressEntries}
+                    prescriptions={prescriptions}
                     appointments={appointments}
                   />
                 </Layout>
@@ -141,7 +181,10 @@ export default function App() {
           <Route 
             path="/appointment-booking" 
             element={
-              <Layout userName={userData.firstName} onLogout={handleLogout}>
+              <Layout
+              userName={userData.firstName}
+              onLogout={handleLogout}
+              >
                 <AppointmentBooking
                   addAppointment={addAppointment}
                   userZipCode={userData.zipCode}
@@ -178,12 +221,19 @@ export default function App() {
           <Route
             path="/settings"
             element={
-              <Layout userName={userData.firstName} onLogout={handleLogout}>
-                <Settings userData={userData} setUserData={setUserData} />
-              </Layout>
+              isAuthenticated ? (
+                <Layout
+                  userName={userData.firstName}
+                  onLogout={handleLogout}
+                >
+                  <Settings userData={userData} setUserData={setUserData} />
+                </Layout>
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
-
           />
+
           <Route
             path="/eligibility-check"
             element={
@@ -193,7 +243,21 @@ export default function App() {
             } 
           />
 
-          <Route path="/calendar-sync" element={<CalanderSync addAppointment={addAppointment} />} />
+          <Route
+            path="/calendar-sync"
+            element={
+              isAuthenticated ? (
+                <Layout
+                  userName={userData.firstName}
+                  onLogout={handleLogout}
+                >
+                  <CalanderSync addAppointment={addAppointment} />
+                </Layout>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
 
           {/* Route for MyAppointments */}
           <Route
@@ -225,16 +289,19 @@ export default function App() {
             }
           />
 
-          <Route
+<Route
             path="/prescriptions"
             element={
               isAuthenticated ? (
-                <Layout userName={userData.firstName} onLogout={handleLogout}>
-                  <Prescriptions prescriptions={[]} onAddPrescription={function (prescription: Omit<Prescription, 'id'>): void {
-                    throw new Error('Function not implemented.');
-                  } } onDeletePrescription={function (id: string): void {
-                    throw new Error('Function not implemented.');
-                  } } />
+                <Layout
+                  userName={userData.firstName}
+                  onLogout={handleLogout}
+                >
+                  <PrescriptionsManager
+                    prescriptions={prescriptions}
+                    onAddPrescription={addPrescription}
+                    onDeletePrescription={deletePrescription}
+                  />
                 </Layout>
               ) : (
                 <Navigate to="/login" replace />
@@ -242,18 +309,21 @@ export default function App() {
             }
           />
 
-          <Route
+<Route
             path="/log-stress"
             element={
               isAuthenticated ? (
-                <Layout userName={userData.firstName} onLogout={handleLogout}>
-                  <LogStress addStressEntry={function (entry: Omit<StressEntry, 'id'>): void {
-                    throw new Error('Function not implemented.');
-                  } } stressEntries={[]} prescriptions={[]} addPrescription={function (prescription: Omit<Prescription, 'id'>): void {
-                    throw new Error('Function not implemented.');
-                  } } deletePrescription={function (id: string): void {
-                    throw new Error('Function not implemented.');
-                  } } />
+                <Layout
+                  userName={userData.firstName}
+                  onLogout={handleLogout}
+                >
+                  <LogStress
+                    addStressEntry={addStressEntry}
+                    stressEntries={stressEntries}
+                    prescriptions={prescriptions}
+                    addPrescription={addPrescription}
+                    deletePrescription={deletePrescription}
+                  />
                 </Layout>
               ) : (
                 <Navigate to="/login" replace />
