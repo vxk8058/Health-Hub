@@ -1,6 +1,5 @@
 import { User, Home, Heart, Settings, Moon, Calendar, Pill, Activity, TrendingUp, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import React from 'react';
 
 interface HomePageProps {
   userName: string;
@@ -97,6 +96,12 @@ export default function HomePage({ userName, stressEntries = [], prescriptions =
               className="w-full bg-gradient-to-r from-[#F0C5D0] to-[#E8B5C8] hover:from-[#E8B5C8] hover:to-[#E0A5C0] text-gray-800 py-3 px-4 rounded-lg text-left text-sm transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Schedule Appointment
+            </button>
+            <button
+              onClick={() => navigate('/my-appointments')}
+              className="w-full bg-gradient-to-r from-[#D0E8F0] to-[#C0D8E8] hover:from-[#C0D8E8] hover:to-[#B0C8E0] text-gray-800 py-3 px-4 rounded-lg text-left text-sm transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              View My Appointments
             </button>
             <button
               onClick={() => navigate('/my-wellness')}
