@@ -7,8 +7,6 @@ export default function WelcomeScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="bg-white rounded-[2rem] p-16 w-full max-w-md shadow-2xl shadow-purple-100 flex flex-col items-center border border-gray-100">
-        <p className="text-gray-400 mb-12 tracking-wide">Welcome screen</p>
-        
         <div className="w-32 h-32 bg-gradient-to-br from-[#9B8BB8] to-[#7B6BA8] rounded-full flex items-center justify-center mb-6 shadow-lg">
           <User className="w-16 h-16 text-white" />
         </div>
