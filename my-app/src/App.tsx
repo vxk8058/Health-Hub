@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom";
 import WelcomeScreen from './components/WelcomeScreen.tsx';
 
-export default function App() {
+function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Router>
@@ -14,3 +17,4 @@ export default function App() {
   );
 }
 
+export default App;
