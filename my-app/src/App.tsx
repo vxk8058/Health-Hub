@@ -281,13 +281,20 @@ export default function App() {
             element={
               isAuthenticated ? (
                 <Layout userName={userData.firstName} onLogout={handleLogout}>
-                  <MyWellness />
+                  <MyWellness
+                    latestEntry={
+                      stressEntries.length > 0
+                        ? stressEntries[stressEntries.length - 1]
+                        : undefined
+                    }
+                  />
                 </Layout>
               ) : (
                 <Navigate to="/login" replace />
               )
             }
           />
+
 
 <Route
             path="/prescriptions"
