@@ -1,6 +1,7 @@
 import { Calendar, Clock, MapPin, User, Stethoscope, X, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Appointment } from '../App';
+import React from 'react';
 
 interface MyAppointmentsProps {
   appointments: Appointment[];
