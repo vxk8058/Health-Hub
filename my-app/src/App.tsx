@@ -11,10 +11,10 @@ import HomePage from './components/HomePage.tsx';
 import MapPage from './components/MapPage.tsx';
 import CalanderSync from './components/CalanderSync.tsx';
 import MyAppointments from './components/MyAppointments.tsx';
-import MyHealthcare from './components/MyHealthcare';
-import Settings from './components/Settings';
-import Layout from './components/Layout';
-import EligibilityCheck from './components/EligibilityCheck';
+import MyHealthcare from './components/MyHealthcare.tsx';
+import Settings from './components/Settings.tsx';
+import Layout from './components/Layout.tsx';
+import EligibilityCheck from './components/EligibilityCheck.tsx';
 
 
 export interface Appointment {
