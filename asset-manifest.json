@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Health-Hub/static/css/main.882a80f1.css",
+    "main.js": "/Health-Hub/static/js/main.bbd58f3e.js",
+    "static/js/453.117b0875.chunk.js": "/Health-Hub/static/js/453.117b0875.chunk.js",
+    "index.html": "/Health-Hub/index.html",
+    "main.882a80f1.css.map": "/Health-Hub/static/css/main.882a80f1.css.map",
+    "main.bbd58f3e.js.map": "/Health-Hub/static/js/main.bbd58f3e.js.map",
+    "453.117b0875.chunk.js.map": "/Health-Hub/static/js/453.117b0875.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.882a80f1.css",
+    "static/js/main.bbd58f3e.js"
+  ]
+}
