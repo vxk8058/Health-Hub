@@ -30,12 +30,12 @@ export default function Login({ setUserData, handleLogin }: LoginProps) {
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="bg-white rounded-[2rem] p-16 w-full max-w-md shadow-2xl shadow-purple-100 border border-gray-100">
         <div className="mb-8">
-          <label className="block text-gray-700 mb-3">Login</label>
+          <label className="block text-gray-700 mb-3">Email</label>
           <input
             type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email or Username"
+            placeholder="Email"
             className="w-full px-6 py-3 border border-gray-200 rounded-full focus:outline-none focus:border-[#8B7BA8] focus:ring-2 focus:ring-[#8B7BA8]/20 transition-all duration-200 bg-gray-50 hover:bg-white"
           />
         </div>
@@ -51,7 +51,7 @@ export default function Login({ setUserData, handleLogin }: LoginProps) {
           />
         </div>
         
-        <p className="text-gray-400 text-center mb-8">Forgot your password? <span className="underline cursor-pointer hover:text-[#8B7BA8] transition-colors" onClick={() => navigate('/create-account')}>Sign up</span></p>
+        <p className="text-gray-400 text-center mb-8">Don't have an account? <span className="underline cursor-pointer hover:text-[#8B7BA8] transition-colors" onClick={() => navigate('/create-account')}>Sign up</span></p>
         
         <button
           onClick={handleSubmit}

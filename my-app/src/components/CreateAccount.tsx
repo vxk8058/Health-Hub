@@ -34,7 +34,7 @@ export default function CreateAccount({ setUserData, handleLogin }: CreateAccoun
         <p className="text-gray-400 mb-12 tracking-wide">Create Account</p>
         
         <div className="mb-8">
-          <label className="block text-gray-700 mb-3">Health Hub</label>
+          {/* <label className="block text-gray-700 mb-3">Health Hub</label> */}
           <input
             type="text"
             placeholder="First Name"
