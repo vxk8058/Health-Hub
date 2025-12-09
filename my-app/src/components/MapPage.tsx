@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Clock, Star, Loader2 } from 'lucide-react';
+import { Search, MapPin, Clock, Star, Loader2, Info } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import React from 'react';
 
 interface HealthCenter {
   name: string;
@@ -15,18 +14,21 @@ interface HealthCenter {
   rating: number;
   phone: string;
   distance?: number;
+  costType?: 'Free' | 'Low-Cost' | 'Sliding Scale' | 'Standard';
 }
 
 export default function MapPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedType, setSelectedType] = useState('All');
+  const [selectedCostType, setSelectedCostType] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [zipCode, setZipCode] = useState((location.state as any)?.zipCode || '');
   const [loading, setLoading] = useState(false);
   const [healthCenters, setHealthCenters] = useState<HealthCenter[]>([]);
 
   const types = ['All', 'Clinic', 'Hospital'];
+  const costTypes = ['All', 'Free Services', 'Low-Cost', 'Sliding Scale', 'Standard'];
 
   // Simulate fetching health centers based on ZIP code
   const fetchHealthCenters = (zip: string) => {
@@ -80,6 +82,9 @@ export default function MapPage() {
         ? (i % 2 === 0 ? 'Immediate Care' : 'Same Day Appointments')
         : availabilityOptions[(seed + i) % availabilityOptions.length];
       
+      const costTypeOptions = ['Free', 'Low-Cost', 'Sliding Scale', 'Standard'];
+      const costType = costTypeOptions[(seed + i) % costTypeOptions.length];
+      
       centers.push({
         name: `${prefix} ${suffix}`,
         address: `${streetNumber} ${street}`,
@@ -91,7 +96,8 @@ export default function MapPage() {
         availability: availability,
         rating: 4.5 + ((seed + i) % 5) / 10,
         phone: `(${200 + (seed % 800)}) ${100 + (i * 111) % 900}-${1000 + (seed + i * 234) % 9000}`,
-        distance: 0.5 + ((seed + i * 7) % 100) / 10
+        distance: 0.5 + ((seed + i * 7) % 100) / 10,
+        costType: costType
       });
     }
     
@@ -119,7 +125,17 @@ export default function MapPage() {
                          center.address.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = selectedType === 'All' || center.type === selectedType;
     
-    return matchesSearch && matchesType;
+    // Map display labels to internal cost type values
+    let matchesCostType = selectedCostType === 'All';
+    if (!matchesCostType) {
+      if (selectedCostType === 'Free Services') {
+        matchesCostType = center.costType === 'Free';
+      } else {
+        matchesCostType = center.costType === selectedCostType;
+      }
+    }
+    
+    return matchesSearch && matchesType && matchesCostType;
   });
 
   const getAvailabilityColor = (availability: string) => {
@@ -138,6 +154,44 @@ export default function MapPage() {
       return 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 border border-indigo-200';
     }
     return 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-700 border border-gray-200';
+  };
+
+  const getCostTypeColor = (costType?: string) => {
+    switch (costType) {
+      case 'Free':
+        return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200';
+      case 'Low-Cost':
+        return 'bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 border border-teal-200';
+      case 'Sliding Scale':
+        return 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border border-blue-200';
+      case 'Standard':
+        return 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-700 border border-gray-200';
+      default:
+        return 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border border-purple-200';
+    }
+  };
+
+  const getCostTypeLabel = (costType?: string) => {
+    if (costType === 'Free') return 'Free Services';
+    if (costType === 'Low-Cost') return 'Low-Cost';
+    if (costType === 'Sliding Scale') return 'Sliding Scale';
+    if (costType === 'Standard') return 'Standard Fees';
+    return 'Cost Not Listed';
+  };
+
+  const getCostTypeDescription = (costType: string) => {
+    switch (costType) {
+      case 'Free Services':
+        return 'No charge for services. Care is provided at no cost to you.';
+      case 'Low-Cost':
+        return 'Reduced fees for healthcare services. More affordable than standard rates.';
+      case 'Sliding Scale':
+        return 'Fees based on your income and family size. You pay what you can afford.';
+      case 'Standard':
+        return 'Regular healthcare fees. Standard insurance and payment options accepted.';
+      default:
+        return 'View all available health centers regardless of cost.';
+    }
   };
 
   return (
@@ -203,6 +257,47 @@ export default function MapPage() {
                       {type}
                     </button>
                   ))}
+                </div>
+              </div>
+              
+              {/* Filter by Cost Type */}
+              <div>
+                <label className="block text-sm text-gray-700 mb-3">Filter by Cost Type</label>
+                <div className="flex flex-col gap-2">
+                  {costTypes.map((costType) => (
+                    <div key={costType} className="relative group/tooltip">
+                      <button
+                        onClick={() => setSelectedCostType(costType)}
+                        className={`w-full px-4 py-3 rounded-xl transition-all duration-200 text-left flex items-center justify-between gap-2 ${
+                          selectedCostType === costType
+                            ? 'bg-gradient-to-r from-[#8B7BA8] to-[#7B6BA8] text-white shadow-md'
+                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                        }`}
+                      >
+                        <span>{costType}</span>
+                        <Info className={`w-4 h-4 flex-shrink-0 ${
+                          selectedCostType === costType ? 'text-white/80' : 'text-gray-400'
+                        }`} />
+                      </button>
+                      {/* Tooltip */}
+                      <div className="absolute left-full ml-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity duration-200 z-50 w-64">
+                        <div className="bg-gray-900 text-white text-xs rounded-xl p-3 shadow-2xl">
+                          <p className="leading-relaxed">{getCostTypeDescription(costType)}</p>
+                          <div className="absolute right-full top-1/2 transform -translate-y-1/2">
+                            <div className="border-8 border-transparent border-r-gray-900"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Info helper text */}
+                <div className="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
+                  <p className="text-xs text-blue-800 leading-relaxed">
+                    <Info className="w-3 h-3 inline mr-1" />
+                    Hover over each option to learn more about different cost types
+                  </p>
                 </div>
               </div>
 
@@ -370,6 +465,9 @@ export default function MapPage() {
                         </span>
                         <span className={`px-4 py-1.5 text-sm rounded-full shadow-sm ${getAvailabilityColor(center.availability)}`}>
                           {center.availability}
+                        </span>
+                        <span className={`px-4 py-1.5 text-sm rounded-full shadow-sm ${getCostTypeColor(center.costType)}`}>
+                          {getCostTypeLabel(center.costType)}
                         </span>
                       </div>
                     </div>
