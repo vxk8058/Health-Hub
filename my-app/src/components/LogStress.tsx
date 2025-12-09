@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, BookOpen, X, Calendar, Moon, Smile, Frown, Meh } from 'lucide-react';
+import { Save, BookOpen, X, Calendar, Moon, Smile, Frown, Meh, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { StressEntry } from '../App';
 import PrescriptionManager, { Prescription } from './PrescriptionManager.tsx';
@@ -11,39 +11,90 @@ interface LogStressProps {
   prescriptions: Prescription[];
   addPrescription: (prescription: Omit<Prescription, 'id'>) => void;
   deletePrescription: (id: string) => void;
+  updateStressEntry?: (id: string, entry: Omit<StressEntry, 'id'>) => void;
 }
 
-export default function LogStress({ addStressEntry, stressEntries, prescriptions, addPrescription, deletePrescription }: LogStressProps) {
+export default function LogStress({ addStressEntry, stressEntries, prescriptions, addPrescription, deletePrescription, updateStressEntry }: LogStressProps) {
   const [stressLevel, setStressLevel] = useState(3);
   const [sleepHours, setSleepHours] = useState(8);
   const [journal, setJournal] = useState('');
   const [mood, setMood] = useState('Good');
   const [showPastEntries, setShowPastEntries] = useState(false);
   const [activeTab, setActiveTab] = useState<'log' | 'prescriptions'>('log');
+  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+
+  // Check if there's an entry for today
+  const today = new Date();
+  const todayStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const todayEntry = stressEntries.find(entry => entry.date === todayStr);
 
   const handleSave = () => {
     if (journal) {
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      // Check if we're editing an existing entry or if today already has an entry
+      const existingTodayEntry = stressEntries.find(entry => entry.date === todayStr);
       
-      addStressEntry({
-        date: dateStr,
-        stressLevel,
-        sleepHours,
-        journal,
-        typeNote: '',
-        mood
-      });
+      if (editingEntryId && updateStressEntry) {
+        // Update the existing entry being edited
+        updateStressEntry(editingEntryId, {
+          date: todayStr,
+          stressLevel,
+          sleepHours,
+          journal,
+          typeNote: '',
+          mood
+        });
+        alert('Entry updated successfully!');
+        setEditingEntryId(null);
+      } else if (existingTodayEntry && updateStressEntry) {
+        // If there's already an entry for today and we're not explicitly editing, update it
+        updateStressEntry(existingTodayEntry.id, {
+          date: todayStr,
+          stressLevel,
+          sleepHours,
+          journal,
+          typeNote: '',
+          mood
+        });
+        alert('Today\'s entry updated successfully!');
+      } else {
+        // Add new entry only if no entry exists for today
+        addStressEntry({
+          date: todayStr,
+          stressLevel,
+          sleepHours,
+          journal,
+          typeNote: '',
+          mood
+        });
+        alert('Stress log saved successfully!');
+      }
 
       // Reset form
       setStressLevel(3);
       setSleepHours(8);
       setJournal('');
       setMood('Good');
-      
-      // Show success feedback
-      alert('Stress log saved successfully!');
+    } else {
+      alert('Please write a journal entry before saving.');
     }
+  };
+
+  const handleEditTodayEntry = () => {
+    if (todayEntry) {
+      setStressLevel(todayEntry.stressLevel);
+      setSleepHours(todayEntry.sleepHours);
+      setJournal(todayEntry.journal);
+      setMood(todayEntry.mood);
+      setEditingEntryId(todayEntry.id);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setStressLevel(3);
+    setSleepHours(8);
+    setJournal('');
+    setMood('Good');
+    setEditingEntryId(null);
   };
 
   const getMoodIcon = (moodValue: string) => {
@@ -93,9 +144,59 @@ export default function LogStress({ addStressEntry, stressEntries, prescriptions
         </div>
         
         {activeTab === 'log' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Input Forms */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6">
+            {/* Action Buttons at the Top */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex flex-wrap items-center gap-4">
+                <button
+                  onClick={handleSave}
+                  className="flex-1 min-w-[200px] bg-gradient-to-r from-[#D4C5E8] to-[#C4B5D8] hover:from-[#C4B5D8] hover:to-[#B4A5C8] text-gray-800 py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                >
+                  <Save className="w-5 h-5" />
+                  {editingEntryId ? 'Update Entry' : 'Save Entry'}
+                </button>
+                
+                {todayEntry && !editingEntryId && (
+                  <button
+                    onClick={handleEditTodayEntry}
+                    className="flex-1 min-w-[200px] bg-gradient-to-r from-[#F0C5D0] to-[#E8B5C8] hover:from-[#E8B5C8] hover:to-[#E0A5C0] text-gray-800 py-4 px-6 rounded-2xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                  >
+                    <Edit className="w-5 h-5" />
+                    Edit Today&apos;s Entry
+                  </button>
+                )}
+                
+                {editingEntryId && (
+                  <button
+                    onClick={handleCancelEdit}
+                    className="flex-1 min-w-[200px] bg-gray-200 hover:bg-gray-300 text-gray-800 py-4 px-6 rounded-2xl transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+                  >
+                    <X className="w-5 h-5" />
+                    Cancel Edit
+                  </button>
+                )}
+                
+                <button
+                  onClick={() => setShowPastEntries(true)}
+                  className="flex-1 min-w-[200px] bg-gradient-to-r from-[#8B7BA8] to-[#7B6BA8] hover:from-[#7B6BA8] hover:to-[#6B5B98] text-white py-4 px-6 rounded-2xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                >
+                  <BookOpen className="w-5 h-5" />
+                  Past Entries ({stressEntries.length})
+                </button>
+              </div>
+              
+              {editingEntryId && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                  <p className="text-sm text-blue-800 flex items-center gap-2">
+                    <Edit className="w-4 h-4" />
+                    You are currently editing today&apos;s entry. Make your changes and click &quot;Update Entry&quot; to save.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Input Forms */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Stress Level */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
                 <label className="block text-gray-800 mb-4 flex items-center gap-2">
@@ -181,24 +282,6 @@ export default function LogStress({ addStressEntry, stressEntries, prescriptions
                   className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#8B7BA8] focus:ring-2 focus:ring-[#8B7BA8]/20 transition-all duration-200 bg-gray-50 hover:bg-white resize-none"
                 />
               </div>
-            </div>
-            
-            {/* Right Column - Actions */}
-            <div className="space-y-4">
-              <button
-                onClick={() => setShowPastEntries(true)}
-                className="w-full bg-gradient-to-r from-[#F0C5D0] to-[#E8B5C8] hover:from-[#E8B5C8] hover:to-[#E0A5C0] text-gray-800 py-4 px-6 rounded-2xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
-              >
-                <BookOpen className="w-5 h-5" />
-                Past Entries ({stressEntries.length})
-              </button>
-              <button
-                onClick={handleSave}
-                className="w-full bg-gradient-to-r from-[#D4C5E8] to-[#C4B5D8] hover:from-[#C4B5D8] hover:to-[#B4A5C8] text-gray-800 py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-              >
-                <Save className="w-5 h-5" />
-                Save Entry
-              </button>
             </div>
           </div>
         ) : (
