@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, BookOpen, X, Calendar, Moon, Smile, Frown, Meh, Edit } from 'lucide-react';
+import { Save, BookOpen, X, Calendar, Moon, Smile, Frown, Meh, Edit, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { StressEntry } from '../App';
 import PrescriptionManager, { Prescription } from './PrescriptionManager.tsx';
@@ -22,71 +22,80 @@ export default function LogStress({ addStressEntry, stressEntries, prescriptions
   const [showPastEntries, setShowPastEntries] = useState(false);
   const [activeTab, setActiveTab] = useState<'log' | 'prescriptions'>('log');
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+  const [editingEntryTime, setEditingEntryTime] = useState<string>('');
+  const [editingEntryDate, setEditingEntryDate] = useState<string>('');
 
-  // Check if there's an entry for today
+  // Get current date and time
   const today = new Date();
   const todayStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  const todayEntry = stressEntries.find(entry => entry.date === todayStr);
+  const currentTime = today.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
   const handleSave = () => {
-    if (journal) {
-      // Check if we're editing an existing entry or if today already has an entry
-      const existingTodayEntry = stressEntries.find(entry => entry.date === todayStr);
-      
-      if (editingEntryId && updateStressEntry) {
-        // Update the existing entry being edited
-        updateStressEntry(editingEntryId, {
-          date: todayStr,
-          stressLevel,
-          sleepHours,
-          journal,
-          typeNote: '',
-          mood
-        });
-        alert('Entry updated successfully!');
-        setEditingEntryId(null);
-      } else if (existingTodayEntry && updateStressEntry) {
-        // If there's already an entry for today and we're not explicitly editing, update it
-        updateStressEntry(existingTodayEntry.id, {
-          date: todayStr,
-          stressLevel,
-          sleepHours,
-          journal,
-          typeNote: '',
-          mood
-        });
-        alert('Today\'s entry updated successfully!');
-      } else {
-        // Add new entry only if no entry exists for today
-        addStressEntry({
-          date: todayStr,
-          stressLevel,
-          sleepHours,
-          journal,
-          typeNote: '',
-          mood
-        });
-        alert('Stress log saved successfully!');
+    if (!journal) {
+      alert('Please write a journal entry before saving.');
+      return;
+    }
+
+    // If we're editing an existing entry
+    if (editingEntryId) {
+      if (!updateStressEntry) {
+        console.error('updateStressEntry function not available!');
+        alert('Error: Cannot update entry. Missing update function.');
+        return;
       }
 
-      // Reset form
-      setStressLevel(3);
-      setSleepHours(8);
-      setJournal('');
-      setMood('Good');
+      console.log('Updating entry ID:', editingEntryId);
+      console.log('Original date:', editingEntryDate);
+      console.log('Original time:', editingEntryTime);
+      
+      // Update the specific entry - preserve original date and time
+      updateStressEntry(editingEntryId, {
+        date: editingEntryDate,
+        stressLevel,
+        sleepHours,
+        journal,
+        typeNote: editingEntryTime,
+        mood
+      });
+      
+      alert('Entry updated successfully!');
+      
+      // Reset editing state
+      setEditingEntryId(null);
+      setEditingEntryTime('');
+      setEditingEntryDate('');
     } else {
-      alert('Please write a journal entry before saving.');
+      // Create a new entry
+      console.log('Creating new entry');
+      addStressEntry({
+        date: todayStr,
+        stressLevel,
+        sleepHours,
+        journal,
+        typeNote: currentTime,
+        mood
+      });
+      alert('Entry saved successfully!');
     }
+
+    // Reset form
+    setStressLevel(3);
+    setSleepHours(8);
+    setJournal('');
+    setMood('Good');
   };
 
-  const handleEditTodayEntry = () => {
-    if (todayEntry) {
-      setStressLevel(todayEntry.stressLevel);
-      setSleepHours(todayEntry.sleepHours);
-      setJournal(todayEntry.journal);
-      setMood(todayEntry.mood);
-      setEditingEntryId(todayEntry.id);
-    }
+  const handleEditEntry = (entry: StressEntry) => {
+    console.log('Editing entry:', entry);
+    setStressLevel(entry.stressLevel);
+    setSleepHours(entry.sleepHours);
+    setJournal(entry.journal);
+    setMood(entry.mood);
+    setEditingEntryId(entry.id);
+    setEditingEntryTime(entry.typeNote || '');
+    setEditingEntryDate(entry.date);
+    setShowPastEntries(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelEdit = () => {
@@ -95,6 +104,8 @@ export default function LogStress({ addStressEntry, stressEntries, prescriptions
     setJournal('');
     setMood('Good');
     setEditingEntryId(null);
+    setEditingEntryTime('');
+    setEditingEntryDate('');
   };
 
   const getMoodIcon = (moodValue: string) => {
@@ -156,16 +167,6 @@ export default function LogStress({ addStressEntry, stressEntries, prescriptions
                   {editingEntryId ? 'Update Entry' : 'Save Entry'}
                 </button>
                 
-                {todayEntry && !editingEntryId && (
-                  <button
-                    onClick={handleEditTodayEntry}
-                    className="flex-1 min-w-[200px] bg-gradient-to-r from-[#F0C5D0] to-[#E8B5C8] hover:from-[#E8B5C8] hover:to-[#E0A5C0] text-gray-800 py-4 px-6 rounded-2xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                  >
-                    <Edit className="w-5 h-5" />
-                    Edit Today&apos;s Entry
-                  </button>
-                )}
-                
                 {editingEntryId && (
                   <button
                     onClick={handleCancelEdit}
@@ -189,7 +190,7 @@ export default function LogStress({ addStressEntry, stressEntries, prescriptions
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
                   <p className="text-sm text-blue-800 flex items-center gap-2">
                     <Edit className="w-4 h-4" />
-                    You are currently editing today&apos;s entry. Make your changes and click &quot;Update Entry&quot; to save.
+                    Editing entry from {editingEntryDate} at {editingEntryTime}. Make your changes and click &quot;Update Entry&quot; to save.
                   </p>
                 </div>
               )}
@@ -326,12 +327,24 @@ export default function LogStress({ addStressEntry, stressEntries, prescriptions
                         </div>
                         <div>
                           <span className="text-gray-800 block mb-1">{entry.date}</span>
-                          <span className="text-xs text-gray-500">Entry #{stressEntries.length - index}</span>
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <Clock className="w-3 h-3" />
+                            <span>{entry.typeNote || 'No time recorded'}</span>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 bg-white/80 px-4 py-2 rounded-xl shadow-sm border border-purple-100">
-                        {getMoodIcon(entry.mood)}
-                        <span className="text-sm text-gray-700">{entry.mood}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 bg-white/80 px-4 py-2 rounded-xl shadow-sm border border-purple-100">
+                          {getMoodIcon(entry.mood)}
+                          <span className="text-sm text-gray-700">{entry.mood}</span>
+                        </div>
+                        <button
+                          onClick={() => handleEditEntry(entry)}
+                          className="p-2 bg-gradient-to-r from-[#8B7BA8] to-[#7B6BA8] hover:from-[#7B6BA8] hover:to-[#6B5B98] text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+                          title="Edit this entry"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                     

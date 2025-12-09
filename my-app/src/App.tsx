@@ -121,6 +121,12 @@ export default function App() {
     setStressEntries((prev) => [...prev, newEntry]);
   };
 
+  const updateStressEntry = (id: string, entry: Omit<StressEntry, 'id'>) => {
+    setStressEntries((prev) =>
+      prev.map((e) => (e.id === id ? { ...entry, id } : e))
+    );
+  };
+
   const addPrescription = (prescription: Omit<Prescription, 'id'>) => {
     const newRx: Prescription = {
       ...prescription,
@@ -335,6 +341,7 @@ export default function App() {
                     prescriptions={prescriptions}
                     addPrescription={addPrescription}
                     deletePrescription={deletePrescription}
+                    updateStressEntry={updateStressEntry}
                   />
                 </Layout>
               ) : (
