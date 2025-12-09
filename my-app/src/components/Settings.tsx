@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Save, LogOut, Phone, Mail, MapPin, Calendar, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import React from 'react';
 
 interface SettingsProps {
   userData: {
@@ -48,31 +47,7 @@ export default function Settings({ userData, onUpdateUserData, onLogout }: Setti
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Profile Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm sticky top-6">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#9B8BB8] to-[#7B6BA8] rounded-full flex items-center justify-center shadow-lg mx-auto mb-4">
-                <User className="w-12 h-12 text-white" />
-              </div>
-              <div className="text-center">
-                <h3 className="text-gray-800 mb-1">{formData.firstName} {formData.lastName}</h3>
-                <p className="text-sm text-gray-500 mb-6">{formData.email}</p>
-              </div>
-
-              <div className="space-y-3 pt-6 border-t border-gray-200">
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <Phone className="w-4 h-4 text-[#8B7BA8]" />
-                  <span>{formData.phone || 'No phone added'}</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <MapPin className="w-4 h-4 text-[#8B7BA8]" />
-                  <span>{formData.zipCode || 'No ZIP code'}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Edit Form */}
+          {/* Left Column - Personal Information Form */}
           <div className="lg:col-span-2 space-y-6">
             {/* Personal Information Section */}
             <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
@@ -201,6 +176,26 @@ export default function Settings({ userData, onUpdateUserData, onLogout }: Setti
                     }`}
                   />
                 </div>
+
+                {/* ZIP Code */}
+                <div>
+                  <label className="block text-sm text-gray-700 mb-2 flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-[#8B7BA8]" />
+                    ZIP Code
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.zipCode}
+                    onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                    disabled={!isEditing}
+                    placeholder="12345"
+                    className={`w-full px-4 py-3 border border-gray-200 rounded-xl transition-all duration-200 ${
+                      isEditing 
+                        ? 'bg-white focus:outline-none focus:border-[#8B7BA8] focus:ring-2 focus:ring-[#8B7BA8]/20' 
+                        : 'bg-gray-50 cursor-not-allowed'
+                    }`}
+                  />
+                </div>
               </div>
 
               {isEditing && (
@@ -235,6 +230,30 @@ export default function Settings({ userData, onUpdateUserData, onLogout }: Setti
                 <LogOut className="w-5 h-5" />
                 Log Out
               </button>
+            </div>
+          </div>
+
+          {/* Right Column - Profile Summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm sticky top-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#9B8BB8] to-[#7B6BA8] rounded-full flex items-center justify-center shadow-lg mx-auto mb-4">
+                <User className="w-12 h-12 text-white" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-gray-800 mb-1">{formData.firstName} {formData.lastName}</h3>
+                <p className="text-sm text-gray-500 mb-6">{formData.email}</p>
+              </div>
+
+              <div className="space-y-3 pt-6 border-t border-gray-200">
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <Phone className="w-4 h-4 text-[#8B7BA8]" />
+                  <span>{formData.phone || 'No phone added'}</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <MapPin className="w-4 h-4 text-[#8B7BA8]" />
+                  <span>{formData.zipCode || 'No ZIP code'}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
