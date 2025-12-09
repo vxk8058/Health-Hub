@@ -21,6 +21,21 @@ export default function EligibilityCheck() {
     'Medicaid'
   ];
 
+  const handleMemberIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, ""); // remove non-digits
+  
+    // Format XXXX-XXX-XXXX
+    if (value.length > 4 && value.length <= 7) {
+      value = value.replace(/(\d{4})(\d+)/, "$1-$2");
+    } else if (value.length > 7) {
+      value = value.replace(/(\d{4})(\d{3})(\d+)/, "$1-$2-$3");
+    }
+  
+    // Limit to 11 digits (4 + 3 + 4)
+    if (value.length > 14) return;
+  
+    setMemberId(value);
+  };  
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 shadow-sm">
@@ -91,8 +106,9 @@ export default function EligibilityCheck() {
             <input
               type="text"
               value={memberId}
-              onChange={(e) => setMemberId(e.target.value)}
-              placeholder="Enter your member ID"
+              onChange={handleMemberIdChange}
+              placeholder="XXXX-XXX-XXXX"
+              maxLength={14}
               className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#8B7BA8] focus:ring-2 focus:ring-[#8B7BA8]/20 transition-all duration-200 bg-white"
             />
           </div>
@@ -108,7 +124,10 @@ export default function EligibilityCheck() {
         </button>
         <button
           onClick={() => setStep(3)}
-          disabled={!insuranceProvider || !memberId}
+          disabled={
+            !insuranceProvider ||
+            !/^\d{4}-\d{3}-\d{4}$/.test(memberId) // must match the format
+          }
           className="flex-1 bg-gradient-to-r from-[#D4C5E8] to-[#C4B5D8] hover:from-[#C4B5D8] hover:to-[#B4A5C8] text-gray-800 py-4 px-8 rounded-2xl transition-all duration-200 shadow-md hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
           Check Eligibility
@@ -211,7 +230,11 @@ export default function EligibilityCheck() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-gray-800 mb-2">Eligibility Check</h1>
-            <p className="text-gray-600">Verify your insurance coverage</p>
+            <p className="text-gray-600">
+              {step === 1 && "Step 1: Enter personal information"}
+              {step === 2 && "Step 2: Enter your insurance details"}
+              {step === 3 && "Step 3: Eligibility Results"}
+            </p>
           </div>
           <div className="flex gap-2">
             <div className={`w-10 h-2 rounded-full transition-all duration-300 ${step === 1 ? 'bg-gradient-to-r from-[#8B7BA8] to-[#7B6BA8]' : 'bg-gray-200'}`} />
@@ -219,49 +242,9 @@ export default function EligibilityCheck() {
             <div className={`w-10 h-2 rounded-full transition-all duration-300 ${step === 3 ? 'bg-gradient-to-r from-[#8B7BA8] to-[#7B6BA8]' : 'bg-gray-200'}`} />
           </div>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Sidebar - Step Info */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm sticky top-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-[#9B8BB8] to-[#7B6BA8] rounded-full flex items-center justify-center shadow-lg mx-auto mb-4">
-                {step === 3 ? (
-                  <CheckCircle2 className="w-8 h-8 text-white" />
-                ) : (
-                  <Shield className="w-8 h-8 text-white" />
-                )}
-              </div>
-              <div className="text-center mb-6">
-                <h3 className="text-gray-800 mb-2">Step {step} of 3</h3>
-                <p className="text-sm text-gray-500">
-                  {step === 1 && 'Personal Information'}
-                  {step === 2 && 'Insurance Details'}
-                  {step === 3 && 'Eligibility Results'}
-                </p>
-              </div>
-
-              <div className="space-y-3 pt-6 border-t border-gray-200">
-                <div className={`flex items-center gap-3 text-sm ${step >= 1 ? 'text-[#8B7BA8]' : 'text-gray-400'}`}>
-                  <div className={`w-2 h-2 rounded-full ${step >= 1 ? 'bg-[#8B7BA8]' : 'bg-gray-300'}`}></div>
-                  <span>Enter personal info</span>
-                </div>
-                <div className={`flex items-center gap-3 text-sm ${step >= 2 ? 'text-[#8B7BA8]' : 'text-gray-400'}`}>
-                  <div className={`w-2 h-2 rounded-full ${step >= 2 ? 'bg-[#8B7BA8]' : 'bg-gray-300'}`}></div>
-                  <span>Provide insurance details</span>
-                </div>
-                <div className={`flex items-center gap-3 text-sm ${step >= 3 ? 'text-[#8B7BA8]' : 'text-gray-400'}`}>
-                  <div className={`w-2 h-2 rounded-full ${step >= 3 ? 'bg-[#8B7BA8]' : 'bg-gray-300'}`}></div>
-                  <span>View eligibility results</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Content - Forms */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-              {step === 1 ? renderStep1() : step === 2 ? renderStep2() : renderStep3()}
-            </div>
+        <div>
+          <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+            {step === 1 ? renderStep1() : step === 2 ? renderStep2() : renderStep3()}
           </div>
         </div>
       </div>
