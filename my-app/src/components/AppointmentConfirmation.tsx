@@ -14,7 +14,7 @@ export default function AppointmentConfirmation() {
     centerName: 'Springfield Medical Center',
     centerAddress: '123 Main St, Springfield, CA 90001',
     doctorName: 'Dr. Amanda Taylor',
-    doctorSpecialization: 'Family Medicine'
+    doctorSpecialization: 'Family Medicine',
   };
 
   // Parse the date to get day of week
@@ -35,7 +35,7 @@ export default function AppointmentConfirmation() {
           <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center mb-6 shadow-xl mx-auto">
             <Check className="w-12 h-12 text-white" />
           </div>
-          <h1 className="text-gray-800 mb-3">Appointment Confirmed!</h1>
+          <h1 className="text-gray-800 mb-3 text-2xl font-semibold">Appointment Confirmed!</h1>
           <p className="text-gray-600">
             Your appointment has been successfully scheduled
           </p>
@@ -44,8 +44,8 @@ export default function AppointmentConfirmation() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Appointment Details Card */}
           <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-            <h3 className="text-gray-800 mb-6">Appointment Details</h3>
-            
+            <h3 className="text-gray-800 mb-6 text-lg font-medium">Appointment Details</h3>
+
             <div className="space-y-4">
               <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
                 <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -75,7 +75,7 @@ export default function AppointmentConfirmation() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Time</p>
-                  <p className="text-gray-800">{appointmentData.time} - {appointmentData.time.includes('AM') ? appointmentData.time.replace('00 AM', '30 AM') : appointmentData.time.replace('00 PM', '30 PM')}</p>
+                  <p className="text-gray-800">{appointmentData.time}</p>
                   <p className="text-xs text-gray-500 mt-1">30 minutes duration</p>
                 </div>
               </div>
@@ -125,13 +125,16 @@ export default function AppointmentConfirmation() {
               </ul>
             </div>
 
+            {/* Replaced Confirmation Number box with confirmation email message (sample email) */}
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 shadow-sm">
-              <h4 className="text-gray-800 mb-3">Confirmation Number</h4>
+              <h4 className="text-gray-800 mb-3">Confirmation</h4>
               <div className="bg-white rounded-xl p-4 text-center border border-purple-200">
-                <p className="text-2xl text-[#8B7BA8] tracking-wider">APT-{new Date().getFullYear()}-{String(new Date().getMonth() + 1).padStart(2, '0')}-{String(new Date().getDate()).padStart(2, '0')}-{String(Math.floor(Math.random() * 1000)).padStart(3, '0')}</p>
+                <p className="text-sm text-gray-700">
+                  Confirmation email sent to <span className="text-[#8B7BA8] font-medium">test@gmail.com</span>.
+                </p>
               </div>
               <p className="text-xs text-gray-500 text-center mt-3">
-                Please save this number for your records
+                Please save this message for your records
               </p>
             </div>
 
@@ -151,14 +154,14 @@ export default function AppointmentConfirmation() {
         <div className="flex gap-4 justify-center">
           <button
             onClick={() => navigate('/home')}
-            className="px-8 py-4 bg-gradient-to-r from-[#D4C5E8] to-[#C4B5D8] hover:from-[#C4B5D8] hover:to-[#B4A5C8] text-gray-800 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2"
+            className="px-6 py-3 bg-gradient-to-r from-[#D4C5E8] to-[#C4B5D8] hover:from-[#C4B5D8] hover:to-[#B4A5C8] text-gray-800 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2"
           >
             <HomeIcon className="w-5 h-5" />
-            Return to Dashboard
+            <span>Return to Dashboard</span>
           </button>
           <button
             onClick={() => window.print()}
-            className="px-8 py-4 bg-white hover:bg-gray-50 text-gray-800 rounded-xl transition-all duration-200 shadow-md border border-gray-200"
+            className="px-6 py-3 bg-white hover:bg-gray-50 text-gray-800 rounded-xl transition-all duration-200 shadow-md border border-gray-200"
           >
             Print Confirmation
           </button>
