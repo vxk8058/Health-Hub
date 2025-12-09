@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, MapPin, Clock, Star, Loader2, Info } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
 
 interface HealthCenter {
   name: string;

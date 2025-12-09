@@ -44,7 +44,7 @@ export default function CalendarSync({ addAppointment }: CalendarSyncProps) {
   
   const [selectedDate, setSelectedDate] = useState(19);
   const [selectedTime, setSelectedTime] = useState('10:00 AM');
-  const [currentMonth, setCurrentMonth] = useState(10); // October
+  const [currentMonth, setCurrentMonth] = useState(11); // December
   const [currentYear, setCurrentYear] = useState(2025);
 
   // Function to assign a doctor based on center name and type
